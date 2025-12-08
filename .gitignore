@@ -1,0 +1,11 @@
+venv
+web-ext-artifacts
+sync/config.json
+sync/credentials/
+sync/.state.json
+.pytest_cache/
+__pycache__/
+.DS_Store
+logs/*
+!logs/.gitkeep
+!logs/*.py

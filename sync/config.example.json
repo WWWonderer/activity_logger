@@ -1,0 +1,8 @@
+{
+  "credentials_path": "credentials/client_secret.json",
+  "token_path": "credentials/token.json",
+  "folder_id": "YOUR_GOOGLE_DRIVE_FOLDER_ID",
+  "scopes": [
+    "https://www.googleapis.com/auth/drive.file"
+  ]
+}

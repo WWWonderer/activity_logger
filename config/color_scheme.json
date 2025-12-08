@@ -1,0 +1,18 @@
+{
+    "productivity_colors": {
+      "productive": "#1f77b4",
+      "unproductive": "#d62728"
+    },
+    "category_colors": {
+      "Browsing|productive": "#5fa6dd",
+      "Browsing|unproductive": "#f78b8b",
+      "Coding|productive": "#1f77b4",
+      "Entertainment|unproductive": "#ff9999",
+      "Gaming|unproductive": "#ff4d4d",
+      "Writing|productive": "#4d94ff",
+      "Meetings|productive": "#3399cc",
+      "Unknown|unproductive": "#b3b3b3",
+      "Idle|unproductive": "#666666"
+    }
+  }
+  

@@ -1,0 +1,28 @@
+{
+  "Coding": {
+    "rules": [".py", "VSCode", "PyCharm"],
+    "productive": true
+  },
+  "Browsing": {
+    "rules": ["Firefox", "Chrome", "Safari"],
+    "productive": "conditional",
+    "productive_urls": ["chatgpt.com", "leetcode.com", "arxiv.org", "overleaf.com"],
+    "productive_keywords": ["ChatGPT", "StackOverflow", "Hugging Face", "arXiv", "docs.python.org"]
+  },
+  "Gaming": {
+    "rules": ["RuneScape", "League of Legends"],
+    "productive": false
+  },
+  "Entertainment": {
+    "rules": ["YouTube", "Netflix"],
+    "productive": false
+  },
+  "Writing": {
+    "rules": ["Notion", "Word"],
+    "productive": true
+  },
+  "Meetings": {
+    "rules": ["Zoom", "Google Meet"],
+    "productive": true
+  }
+}
