@@ -29,7 +29,9 @@ def test_buffer_to_sessions_rolls_over(monkeypatch, tmp_path):
     buffer = LogBuffer(flush_interval=999, max_rows=10, log_dir=tmp_path, device_id=TEST_DEVICE_ID)
     buffer.buffer = entries.copy()
 
-    monkeypatch.setattr("logger.parquet_writer.categorize", lambda app, title, url="": ("General", True))
+    monkeypatch.setattr(
+        "logger.parquet_writer.classify", lambda *args, **kwargs: ("General", True)
+    )
 
     sessions = buffer._buffer_to_sessions()
 
@@ -60,7 +62,9 @@ def test_flush_writes_expected_sessions(monkeypatch, tmp_path):
     buffer = LogBuffer(flush_interval=999, max_rows=10, log_dir=tmp_path, device_id=TEST_DEVICE_ID)
     buffer.buffer = entries.copy()
 
-    monkeypatch.setattr("logger.parquet_writer.categorize", lambda app, title, url="": ("General", True))
+    monkeypatch.setattr(
+        "logger.parquet_writer.classify", lambda *args, **kwargs: ("General", True)
+    )
 
     recorded = {}
 
@@ -108,7 +112,9 @@ def test_flush_no_session_when_same_app(monkeypatch, tmp_path):
     buffer = LogBuffer(flush_interval=999, max_rows=10, log_dir=tmp_path, device_id=TEST_DEVICE_ID)
     buffer.buffer = entries.copy()
 
-    monkeypatch.setattr("logger.parquet_writer.categorize", lambda app, title, url="": ("General", True))
+    monkeypatch.setattr(
+        "logger.parquet_writer.classify", lambda *args, **kwargs: ("General", True)
+    )
 
     buffer.flush()
 
@@ -136,7 +142,9 @@ def test_force_flush_closes_active_session(monkeypatch, tmp_path):
     buffer = LogBuffer(flush_interval=999, max_rows=10, log_dir=tmp_path, device_id=TEST_DEVICE_ID)
     buffer.buffer = entries.copy()
 
-    monkeypatch.setattr("logger.parquet_writer.categorize", lambda app, title, url="": ("General", True))
+    monkeypatch.setattr(
+        "logger.parquet_writer.classify", lambda *args, **kwargs: ("General", True)
+    )
 
     recorded = {}
 

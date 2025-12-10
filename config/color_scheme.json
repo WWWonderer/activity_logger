@@ -4,14 +4,18 @@
       "unproductive": "#d62728"
     },
     "category_colors": {
-      "Browsing|productive": "#5fa6dd",
-      "Browsing|unproductive": "#f78b8b",
       "Coding|productive": "#1f77b4",
+      "Docs & Learning|productive": "#4dabf7",
+      "Communication|productive": "#5cb85c",
+      "Meetings|productive": "#3399cc",
+      "Research|productive": "#5fa6dd",
+      "Productivity|productive": "#4d94ff",
+      "Social/Forums|unproductive": "#f78b8b",
+      "Shopping|unproductive": "#ffb347",
       "Entertainment|unproductive": "#ff9999",
       "Gaming|unproductive": "#ff4d4d",
-      "Writing|productive": "#4d94ff",
-      "Meetings|productive": "#3399cc",
-      "Unknown|unproductive": "#b3b3b3",
+      "Utilities|unproductive": "#b3b3b3",
+      "Unknown|unproductive": "#999999",
       "Idle|unproductive": "#666666"
     }
   }

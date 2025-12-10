@@ -1,0 +1,5 @@
+{
+  "api_key": "sk-xxxxx",
+  "model": "gpt-4o-mini",
+  "log_calls": false // set to True if you wanna see AI categorization requests on console
+}

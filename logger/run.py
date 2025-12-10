@@ -4,11 +4,29 @@ import subprocess
 from pathlib import Path
 
 from logger.core import get_active_window_info
-from logger.categorize import categorize
+from logger.categorize import categorize, categorize_with_ai
 from logger.device import get_device_id
 from logger.idle import IdleMonitor
 from logger.parquet_writer import LogBuffer
 from sync import get_drive_sync_client
+
+try:
+    from logger.ai_callback import openai_categorize
+except Exception:
+    openai_categorize = None
+
+
+def classify(app, title, url):
+    """
+    Categorize using AI callback if available; otherwise fall back to rules.
+    """
+    url = url or ""
+    if openai_categorize:
+        try:
+            return categorize_with_ai(app, title, url, ai_callback=openai_categorize)
+        except Exception as exc:
+            print(f"[AI categorize fallback] {exc}")
+    return categorize(app, title, url)
 
 
 def _resolve_idle_threshold(user_idle_seconds: int = 300) -> int:
@@ -72,7 +90,7 @@ def run_logger(interval=10, flush_interval=60, max_rows=50):
         device_id=device_id,
         sync_client=drive_sync,
     )
-    idle_threshold = _resolve_idle_threshold(user_idle_seconds=10)  # TODO: make configurable
+    idle_threshold = _resolve_idle_threshold(user_idle_seconds=600)  # TODO: make configurable
     idle_monitor = IdleMonitor(threshold_seconds=idle_threshold)
     idle_active = False
 
@@ -86,23 +104,27 @@ def run_logger(interval=10, flush_interval=60, max_rows=50):
             if is_idle:
                 if not idle_active:
                     idle_active = True
+                    cat, prod = classify("Idle", "Idle", "")
                     info = {
                         "timestamp": now,
                         "app": "Idle",
                         "title": "Idle",
                         "url": None,
+                        "category": cat,
+                        "is_productive": prod,
                     }
-                    info["category"] = categorize(info["app"], info["title"], "")
             else:
                 if idle_active:
                     idle_active = False
                 info = get_active_window_info()
                 if info:
-                    info["category"] = categorize(
+                    cat, prod = classify(
                         info["app"],
                         info["title"],
                         info.get("url") or "",
                     )
+                    info["category"] = cat
+                    info["is_productive"] = prod
 
             DEBUG_LOG = Path(__file__).resolve().parent.parent / "logs" / "debug_samples.txt"
             ts_str = now.isoformat()

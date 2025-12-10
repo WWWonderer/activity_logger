@@ -1,28 +1,158 @@
 {
   "Coding": {
-    "rules": [".py", "VSCode", "PyCharm"],
+    "apps": [
+      "VSCode",
+      "Visual Studio Code",
+      "Code",
+      "PyCharm",
+      "Electron",
+      "IntelliJ",
+      "Terminal",
+      "iTerm"
+    ],
+    "domains": [
+      "localhost",
+      "127.0.0.1"
+    ],
     "productive": true
   },
-  "Browsing": {
-    "rules": ["Firefox", "Chrome", "Safari"],
-    "productive": "conditional",
-    "productive_urls": ["chatgpt.com", "leetcode.com", "arxiv.org", "overleaf.com"],
-    "productive_keywords": ["ChatGPT", "StackOverflow", "Hugging Face", "arXiv", "docs.python.org"]
+  "Docs & Learning": {
+    "apps": [],
+    "domains": [
+      "docs.python.org",
+      "developer.mozilla.org",
+      "readthedocs.io",
+      "arxiv.org",
+      "overleaf.com",
+      "neetcode.io",
+      "leetcode.com",
+      "stackexchange.com",
+      "stackoverflow.com",
+      "platform.openai.com/docs",
+      "www.udemy.com"
+    ],
+    "productive": true
   },
-  "Gaming": {
-    "rules": ["RuneScape", "League of Legends"],
-    "productive": false
-  },
-  "Entertainment": {
-    "rules": ["YouTube", "Netflix"],
-    "productive": false
-  },
-  "Writing": {
-    "rules": ["Notion", "Word"],
+  "Communication": {
+    "apps": [
+      "Mail",
+      "Outlook",
+      "Slack"
+    ],
+    "domains": [
+      "mail.google.com",
+      "outlook.office.com",
+      "outlook.live.com",
+      "slack.com",
+      "accounts.google.com"
+    ],
     "productive": true
   },
   "Meetings": {
-    "rules": ["Zoom", "Google Meet"],
+    "apps": [
+      "Zoom",
+      "Google Meet"
+    ],
+    "domains": [
+      "meet.google.com",
+      "zoom.us"
+    ],
     "productive": true
+  },
+  "Research": {
+    "apps": [],
+    "domains": [
+      "www.google.com/search",
+      "google.com/search",
+      "bing.com/search",
+      "duckduckgo.com",
+      "wikipedia.org",
+      "chatgpt.com"
+    ],
+    "productive": true
+  },
+  "Productivity": {
+    "apps": [
+      "Notion",
+      "Word",
+      "Excel",
+      "PowerPoint",
+      "Pages"
+    ],
+    "domains": [
+      "notion.so",
+      "docs.google.com",
+      "sheets.google.com",
+      "slides.google.com",
+      "drive.google.com",
+      "calendar.google.com"
+    ],
+    "productive": true
+  },
+  "Social/Forums": {
+    "apps": [],
+    "domains": [
+      "www.reddit.com",
+      "reddit.com",
+      "www.zhihu.com",
+      "zhihu.com",
+      "www.hupu.com",
+      "hupu.com",
+      "twitter.com",
+      "x.com",
+      "quora.com"
+    ],
+    "productive": false
+  },
+  "Shopping": {
+    "apps": [],
+    "domains": [
+      "amazon.com",
+      "amazon.ca",
+      "ebay.com",
+      "aliexpress.com"
+    ],
+    "productive": false
+  },
+  "Entertainment": {
+    "apps": [
+      "YouTube",
+      "Netflix",
+      "Prime Video",
+      "Music",
+      "Spotify"
+    ],
+    "domains": [
+      "youtube.com",
+      "youtu.be",
+      "netflix.com",
+      "primevideo.com",
+      "spotify.com",
+      "music.apple.com",
+      "www.youtube.com"
+    ],
+    "productive": false
+  },
+  "Gaming": {
+    "apps": [
+      "RuneScape",
+      "League of Legends",
+      "Steam",
+      "riot client",
+      "leagueclientux",
+      "leagueoflegends"
+    ],
+    "domains": [],
+    "productive": false
+  },
+  "Utilities": {
+    "apps": [
+      "Finder",
+      "System Preferences",
+      "Settings",
+      "App Store"
+    ],
+    "domains": [],
+    "productive": false
   }
 }

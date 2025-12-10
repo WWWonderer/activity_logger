@@ -9,3 +9,5 @@ __pycache__/
 logs/*
 !logs/.gitkeep
 !logs/*.py
+config/ai_config.json
+config/keyword_index.json

@@ -3,8 +3,26 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 from pathlib import Path
 from datetime import datetime
-from logger.categorize import categorize
+from logger.categorize import categorize, categorize_with_ai
 from logger.device import get_device_id
+
+try:
+    from logger.ai_callback import openai_categorize
+except Exception:
+    openai_categorize = None
+
+
+def classify(app, title, url):
+    """
+    Categorize using AI callback if available; otherwise fall back to rules.
+    """
+    url = url or ""
+    if openai_categorize:
+        try:
+            return categorize_with_ai(app, title, url, ai_callback=openai_categorize)
+        except Exception as exc:
+            print(f"[AI categorize fallback] {exc}")
+    return categorize(app, title, url)
 
 class LogBuffer:
     def __init__(
@@ -28,6 +46,8 @@ class LogBuffer:
         self.active_title = None
         self.active_start = None
         self.active_url = None
+        self.active_category = None
+        self.active_productive = None
         self.resume_gap_seconds = resume_gap_seconds
 
         self._resume_from_last_row()
@@ -59,6 +79,13 @@ class LogBuffer:
             self.active_title = last_row["title"]
             self.active_start = end_time
             self.active_url = last_row.get("url") if "url" in last_row else None
+            if "category" in last_row and "is_productive" in last_row:
+                self.active_category = last_row.get("category")
+                self.active_productive = bool(last_row.get("is_productive"))
+            else:
+                self.active_category, self.active_productive = classify(
+                    self.active_app, self.active_title, self.active_url or ""
+                )
             print(f"Resumed active session: {self.active_app} ({self.active_title}) at {self.active_start}")
 
     def add(self, row: dict):
@@ -81,17 +108,24 @@ class LogBuffer:
         current_title = self.active_title
         current_start = self.active_start
         current_url = self.active_url
+        current_category = self.active_category
+        current_productive = self.active_productive
 
         for entry in self.buffer:
             ts = entry["timestamp"]
             app = entry["app"]
             title = entry["title"]
             url = entry.get("url")
+            entry_category = entry.get("category")
+            entry_productive = entry.get("is_productive")
 
             if (app, title, url) != (current_app, current_title, current_url):
                 # close previous session if it existed
                 if current_app is not None:
-                    category, is_productive = categorize(current_app, current_title, current_url or "")
+                    category = current_category
+                    is_productive = current_productive
+                    if category is None or is_productive is None:
+                        category, is_productive = classify(current_app, current_title, current_url or "")
                     sessions.append({
                         "start_time": current_start,
                         "end_time": ts,
@@ -109,12 +143,20 @@ class LogBuffer:
                 current_title = title
                 current_start = ts
                 current_url = url
+                if entry_category is not None and entry_productive is not None:
+                    current_category = entry_category
+                    current_productive = bool(entry_productive)
+                else:
+                    current_category, current_productive = classify(app, title, url or "")
 
             # else: same app/title as before, so just keep going
 
         if close_active and current_app is not None:
             final_end = datetime.now()
-            category, is_productive = categorize(current_app, current_title, current_url or "")
+            category = current_category
+            is_productive = current_productive
+            if category is None or is_productive is None:
+                category, is_productive = classify(current_app, current_title, current_url or "")
             sessions.append({
                 "start_time": current_start,
                 "end_time": final_end,
@@ -130,6 +172,8 @@ class LogBuffer:
             current_title = None
             current_start = None
             current_url = None
+            current_category = None
+            current_productive = None
 
         # after iterating through buffer, DO NOT close the last session yet.
         # we keep it "open" because user might still be in that app.
@@ -138,6 +182,8 @@ class LogBuffer:
         self.active_title = current_title
         self.active_start = current_start
         self.active_url = current_url
+        self.active_category = current_category
+        self.active_productive = current_productive
 
         return sessions
     
