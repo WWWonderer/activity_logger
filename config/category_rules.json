@@ -29,7 +29,8 @@
       "stackexchange.com",
       "stackoverflow.com",
       "platform.openai.com/docs",
-      "www.udemy.com"
+      "www.udemy.com",
+      "workspace.google.com"
     ],
     "productive": true
   },
@@ -67,7 +68,12 @@
       "bing.com/search",
       "duckduckgo.com",
       "wikipedia.org",
-      "chatgpt.com"
+      "chatgpt.com",
+      "github.com",
+      "scholar.google.com",
+      "openreview.net",
+      "text-compare.com",
+      "platform.openai.com"
     ],
     "productive": true
   },
@@ -100,7 +106,10 @@
       "hupu.com",
       "twitter.com",
       "x.com",
-      "quora.com"
+      "quora.com",
+      "discord.com",
+      "www.linkedin.com",
+      "blog.liinks.co"
     ],
     "productive": false
   },
@@ -110,7 +119,8 @@
       "amazon.com",
       "amazon.ca",
       "ebay.com",
-      "aliexpress.com"
+      "aliexpress.com",
+      "www.amazon.ca"
     ],
     "productive": false
   },
@@ -129,7 +139,9 @@
       "primevideo.com",
       "spotify.com",
       "music.apple.com",
-      "www.youtube.com"
+      "www.youtube.com",
+      "www.primevideo.com",
+      "www.rottentomatoes.com"
     ],
     "productive": false
   },
@@ -142,7 +154,9 @@
       "leagueclientux",
       "leagueoflegends"
     ],
-    "domains": [],
+    "domains": [
+      "lichess.org"
+    ],
     "productive": false
   },
   "Utilities": {
@@ -150,9 +164,12 @@
       "Finder",
       "System Preferences",
       "Settings",
-      "App Store"
+      "App Store",
+      "system settings"
     ],
-    "domains": [],
+    "domains": [
+      "auth.openai.com"
+    ],
     "productive": false
   }
 }
