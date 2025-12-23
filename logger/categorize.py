@@ -312,8 +312,7 @@ def _add_rule_from_ai(category, productive, app, title, url):
             if host_lower not in existing_domains:
                 cat_rules["domains"].append(host_lower)
                 print(f'saving {host_lower} to {category}...')
-    else:
-        if app_norm:
+    elif app_norm and app_norm not in BROWSER_APPS:
             existing_apps = [a.lower() for a in cat_rules.get("apps", [])]
             if app_norm not in existing_apps:
                 cat_rules["apps"].append(app_norm)

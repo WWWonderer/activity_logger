@@ -17,7 +17,9 @@
     "productive": true
   },
   "Docs & Learning": {
-    "apps": [],
+    "apps": [
+      "preview"
+    ],
     "domains": [
       "docs.python.org",
       "developer.mozilla.org",
@@ -30,7 +32,13 @@
       "stackoverflow.com",
       "platform.openai.com/docs",
       "www.udemy.com",
-      "workspace.google.com"
+      "workspace.google.com",
+      "www.microsoft.com",
+      "word.cloud.microsoft",
+      "www.office.com",
+      "www.umontreal.ca",
+      "authentification.umontreal.ca",
+      "sites.google.com"
     ],
     "productive": true
   },
@@ -45,7 +53,9 @@
       "outlook.office.com",
       "outlook.live.com",
       "slack.com",
-      "accounts.google.com"
+      "accounts.google.com",
+      "login.microsoftonline.com",
+      "outlook.office365.com"
     ],
     "productive": true
   },
@@ -73,7 +83,11 @@
       "scholar.google.com",
       "openreview.net",
       "text-compare.com",
-      "platform.openai.com"
+      "platform.openai.com",
+      "wwwonderer.github.io",
+      "www.geeksforgeeks.org",
+      "m365.cloud.microsoft",
+      "gemini.google.com"
     ],
     "productive": true
   },

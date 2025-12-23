@@ -72,3 +72,4 @@ Minor
 - [ ] Fix UI daily bar's hovering info and legend
 - [ ] For weekly/monthly summary, change from 'stack' to a better visualization
 - [ ] Fix repeated API calls to categorize "Unknown" 
+- [x] Fix Firefox bridge incognito mode

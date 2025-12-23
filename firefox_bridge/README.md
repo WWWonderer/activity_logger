@@ -36,6 +36,9 @@ PY
 
 Linux is the same flow but with the manifest under `~/.mozilla/native-messaging-hosts/`.
 
+### Private (incognito) windows
+Firefox blocks extensions from private windows unless you allow it. After loading the add-on, open **about:addons → Activity Logger Bridge → Run in Private Windows → Allow**. Without this toggle, the bridge will not see incognito tabs and the logger will fall back to blank Firefox URLs.
+
 ## Load the extension
 
 1) In Firefox, open `about:debugging#/runtime/this-firefox`.  

@@ -32,6 +32,23 @@ def test_categorize_conditional_not_productive():
     assert category == "Social/Forums"
     assert productive is False
 
+def test_categorize_hupu():
+    category, productive = categorize_fn(
+        "firefox",
+        "虎扑体育-虎扑网",
+        "https://www.hupu.com"
+    )
+    assert category == "Social/Forums"
+    assert productive is False
+
+def test_categorize_zhihu():
+    category, productive = categorize_fn(
+        "firefox",
+        "(75 封私信 / 80 条消息) 首页 - 知乎",
+        "https://www.zhihu.com/"
+    )
+    assert category == "Social/Forums"
+    assert productive is False
 
 def test_categorize_no_rule_match():
     category, productive = categorize_fn("Some Unknown App", "Untitled", "")
