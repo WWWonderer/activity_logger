@@ -1,4 +1,5 @@
 import json
+import math
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -59,7 +60,14 @@ def generate_daily_timeline(df_day, selected_date):
         y=["Your Day"] * len(df_day),
         color="activity_id",
         color_discrete_map=COLOR_CONFIG['category_colors'],
-        hover_data=["app", "title", "category", "duration_min"]
+        custom_data=["app", "title", "category", "duration_min"]
+    )
+    fig.update_traces(
+        hovertemplate=(
+            "<b>%{customdata[0]} | %{customdata[1]}</b><br>"
+            "Category: %{customdata[2]}<br>"
+            "Duration: %{customdata[3]:.1f} min<extra></extra>"
+        )
     )
     fig.update_layout(
         margin=dict(l=80, r=100, t=30, b=40),
@@ -67,7 +75,8 @@ def generate_daily_timeline(df_day, selected_date):
         xaxis_title="Time of Day",
         yaxis_title="",
         height=200,
-        showlegend=True
+        showlegend=True,
+        legend_title_text=""
     )
     selected_date_dt = pd.to_datetime(selected_date).normalize()
     fig.update_xaxes(
@@ -90,6 +99,22 @@ def _get_week_label(selected_date_str: str) -> str:
     week_start = selected_date - timedelta(days=selected_date.weekday())
     week_end = week_start + timedelta(days=6)
     return f"{week_start.strftime('%Y %b %d')} – {week_end.strftime('%b %d')}"
+
+def _format_minutes_with_hours(minutes: float) -> str:
+    hours = minutes / 60
+    if hours.is_integer():
+        hours_str = f"{int(hours)}h"
+    else:
+        hours_str = f"{hours:.1f}h"
+    return f"{int(minutes)}m ({hours_str})"
+
+def _build_minute_ticks(max_minutes: float, step: int = 60):
+    if max_minutes <= 0:
+        max_minutes = step
+    max_tick = int(math.ceil(max_minutes / step) * step)
+    tickvals = list(range(0, max_tick + 1, step))
+    ticktext = [_format_minutes_with_hours(v) for v in tickvals]
+    return tickvals, ticktext
 
 def generate_weekly_summary(df_week, selected_date):
     if df_week.empty:
@@ -194,24 +219,38 @@ def generate_cumulative_weekly_summary(df_week, selected_date):
         summary,
         x="day_label",
         y="duration_min",
-        color="productivity",  # Stacked by category
+        color="productivity",
         custom_data=["date"],
         color_discrete_map=COLOR_CONFIG['productivity_colors'],
         labels={"duration_min": "Study Time (min)", "day_label": "Day"},
-        category_orders={"day_label": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]}
+        category_orders={
+            "day_label": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            "productivity": ["productive", "unproductive"]
+        }
     )
 
     fig.update_traces(
         hovertemplate="%{x}: %{y:.2f} min<br>%{customdata[0]}"
     )
+    max_total = (
+        summary.groupby(["day_label", "date"])["duration_min"]
+        .sum()
+        .max()
+    )
+    max_total = 0 if pd.isna(max_total) else max_total
+    tickvals, ticktext = _build_minute_ticks(max_total, step=60)
+
     fig.update_yaxes(
-        dtick=60,  # 60 minutes per tick
+        tickmode="array",
+        tickvals=tickvals,
+        ticktext=ticktext,
         title="Minutes",
-        rangemode="tozero"
+        rangemode="tozero",
+        automargin=True
     )
     fig.update_layout(
-        barmode="stack",
-        height=200,
+        barmode="group",
+        height=450,
         showlegend=True,
         margin=dict(l=80, r=100, t=30, b=40),
         yaxis_title="",
@@ -323,20 +362,32 @@ def generate_cumulative_monthly_summary(df_month, selected_date):
         color="productivity",
         custom_data=["date"],
         color_discrete_map=COLOR_CONFIG['productivity_colors'],
-        labels={"duration_min": "Study Time (min)", "day": "Day of Month"}
+        labels={"duration_min": "Study Time (min)", "day": "Day of Month"},
+        category_orders={"productivity": ["productive", "unproductive"]}
     )
 
     fig.update_traces(
         hovertemplate="Day %{x}: %{y:.2f} min<br>%{customdata[0]}"
     )
+    max_total = (
+        summary.groupby(["day", "date"])["duration_min"]
+        .sum()
+        .max()
+    )
+    max_total = 0 if pd.isna(max_total) else max_total
+    tickvals, ticktext = _build_minute_ticks(max_total, step=60)
+
     fig.update_yaxes(
-        dtick=60,  # 60 minutes per tick
+        tickmode="array",
+        tickvals=tickvals,
+        ticktext=ticktext,
         title="Minutes",
-        rangemode="tozero"
+        rangemode="tozero",
+        automargin=True
     )
     fig.update_layout(
-        barmode="stack",
-        height=300,
+        barmode="group",
+        height=450,
         showlegend=True,
         margin=dict(l=80, r=100, t=30, b=40),
         yaxis_title="",
