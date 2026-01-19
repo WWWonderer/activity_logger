@@ -1,0 +1,10 @@
+{
+  "name": "activity_logger_bridge",
+  "description": "Activity logger native messaging bridge.",
+  "path": "/ABSOLUTE/PATH/TO/firefox_logger_bridge.py",
+  "type": "stdio",
+  "allowed_extensions": [
+    "activity-logger-bridge@example.com"
+  ]
+}
+
