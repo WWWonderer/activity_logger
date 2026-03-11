@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import threading
 import time
-from typing import Callable, Optional, Tuple
+from typing import Callable, Optional, Tuple, Dict
+from urllib.parse import urlsplit
 from AppKit import NSWorkspace, NSAppleScript
 
 from new_core.models import Event
-from new_core.ports import EventSource
+from new_core.ports import EventSource, AppOverride
 from new_logger.macos.macos_idle import make_idle_monitor
+from new_logger.macos.app_overrides import FirefoxOverride
+from new_logger.sanitization.url_sanitizer import sanitize_url
 
 
 class MacOSFrontAppSourceAdaptive(EventSource):
@@ -19,6 +22,9 @@ class MacOSFrontAppSourceAdaptive(EventSource):
     def __init__(self):
         self.workspace = NSWorkspace.sharedWorkspace()
         self.stop_signal = threading.Event()
+        self.overrides: Dict[str, AppOverride] = {
+            "Firefox": FirefoxOverride()
+        }
         
         # Internal State
         self._prev_key: Optional[Tuple[str, str, str]] = None
@@ -45,6 +51,32 @@ class MacOSFrontAppSourceAdaptive(EventSource):
             end try
         """
         self.apple_script = NSAppleScript.alloc().initWithSource_(self.script_source)
+
+    def _apply_override(self, app_name: str, title: str, url: str) -> Tuple[str, str]:
+        override = self.overrides.get(app_name)
+        if not override:
+            return title, url
+        
+        data = override.get() # return (title, url) or None, defined in app_overrides.py
+        if not data:
+            return title, url
+        
+        o_title, o_url = data
+        return (o_title or title), (o_url or url)
+
+    @staticmethod
+    def _sanitize_http_url(url: str) -> str:
+        value = (url or "").strip()
+        if not value:
+            return ""
+
+        try:
+            scheme = urlsplit(value).scheme.lower()
+            if scheme not in {"http", "https"}:
+                return value
+            return sanitize_url(value).sanitized_url
+        except Exception:
+            return value
 
     def _key_changed(self, old_key: Tuple[str, str, str], new_key: Tuple[str, str, str]) -> bool:
         """Determines if the application state has shifted enough to trigger a new event."""
@@ -75,7 +107,7 @@ class MacOSFrontAppSourceAdaptive(EventSource):
             url=url
         )
         # DEBUG
-        print(event)
+        # print(event)
 
         self.emit(event)
         
@@ -120,9 +152,15 @@ class MacOSFrontAppSourceAdaptive(EventSource):
                         self.stop_signal.wait(self.POLL_INTERVAL)
                         continue
 
+                # 3. Apply Title and URL Override for specific apps
+                title, url = self._apply_override(app_name, title, url)
+                url = self._sanitize_http_url(url)
+
                 current_key = (app_name, title, url)
                 ## DEBUG ##
-                print(current_key)
+                # print(f'prev_key: {self._prev_key}')
+                # print(f'current_key: {current_key}')
+
                 now = time.time()
 
                 # 3. State Change Detection
