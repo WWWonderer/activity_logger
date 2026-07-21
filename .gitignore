@@ -11,3 +11,7 @@ logs/*
 !logs/*.py
 config/ai_config.json
 config/keyword_index.json
+data/*.sqlite3
+data/*.sqlite3-shm
+data/*.sqlite3-wal
+!logs/.gitkeep
