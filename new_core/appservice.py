@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
-from .models import Event
+from .models import CapturedEvent
 from .ports import EventSource, Storage, Classifier, Publisher
 
 
@@ -55,7 +55,7 @@ class AppService:
         self._source.stop()
 
     # -------- ingestion callback --------
-    def _on_event(self, e: Event) -> None:
+    def _on_event(self, e: CapturedEvent) -> None:
         """
         Called by the source when it finalizes a stable foreground segment.
         This must be fast and robust (don't crash on classifier errors).

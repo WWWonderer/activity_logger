@@ -29,7 +29,7 @@ migrated.
 
 `new_core` contains the application-facing types and contracts:
 
-- `models.py` defines `Event` and `Classification`.
+- `models.py` defines `CapturedEvent` and `Classification`.
 - `ports.py` defines the `EventSource`, `Storage`, `Classifier`, `Publisher`,
   and `AppOverride` protocols.
 - `appservice.py` validates finalized events, persists them, optionally runs
@@ -51,7 +51,7 @@ implemented.
   emitted.
 
 The source owns segmentation. When the foreground state changes, it emits a
-finalized `Event` with both `start_ts` and `end_ts`; `AppService` does not keep
+finalized `CapturedEvent` with both `start_ts` and `end_ts`; `AppService` does not keep
 open database rows.
 
 ### Storage
@@ -76,6 +76,65 @@ user override > engine classification
 SQLite runs in WAL mode, so an active or recently opened database may have
 `-wal` and `-shm` companion files. Runtime databases under `data/` are ignored
 by Git.
+
+### Queries
+
+`new_core/queries.py` defines the `RecordedEvent` read model and the
+`EventQueries` protocol. `new_storage/sqlite_queries.py` implements that
+contract with complete event-range reads and runtime-derived duration mappings
+by category, application, and local day. Aggregate results are not persisted
+as separate models or tables.
+
+`events_in_range(start_ts, end_ts)` returns every overlapping event in
+chronological order for detailed timeline rendering. It deliberately has no
+pagination or row cap, so a dashboard does not silently draw a partial
+timeline. Longer-range summary charts should use `bucketed_totals(...)` rather
+than loading individual events.
+
+Events are selected when they overlap the requested half-open time range.
+Totals clip events at the range boundaries, and daily totals split events at
+midnight. Effective labels use this precedence:
+
+```text
+user override > latest engine classification > Unknown
+```
+
+The adapter defaults to UTC day boundaries. A dashboard can request local-day
+totals with an IANA timezone:
+
+```python
+queries = SQLiteEventQueries(
+    "data/activity.sqlite3",
+    timezone_name="America/Montreal",
+)
+```
+
+For an adaptive timeline, `bucketed_totals(...)` accepts any exact time range
+and returns nested mappings keyed by ISO-formatted bucket start and category or
+application. Its default `granularity="auto"` selects the chart scale from the
+query duration:
+
+| Query duration | Buckets |
+| --- | --- |
+| Up to 2 days | Hour |
+| Up to 8 weeks | Day |
+| Up to approximately 18 months | Week |
+| Longer | Month |
+
+```python
+points = queries.bucketed_totals(
+    start_ts,
+    end_ts,
+    granularity="auto",
+    group_by="category",
+)
+```
+
+Explicit `hour`, `day`, `week`, and `month` scales are also available for a
+dashboard override. Calendar buckets use the configured timezone, weeks begin
+on Monday, and events spanning boundaries are divided precisely. The dashboard
+should default its selected query interval to the current local day and leave
+the scale on `auto`.
 
 ### Classification
 
@@ -117,13 +176,13 @@ python new_backend.py --no-classify
 The backend closes the source and database connection during a normal shutdown.
 
 
-## Event and Label Flow
+## Captured Event and Label Flow
 
 ### Ingestion
 
 ```text
 1. The macOS source detects a foreground-state change.
-2. It emits the completed segment as an Event.
+2. It emits the completed segment as a `CapturedEvent`.
 3. AppService validates the timestamps.
 4. SQLiteStorage inserts the raw event.
 5. RulesClassifier produces a Classification.
@@ -183,11 +242,13 @@ new_core/
   models.py                      domain types
   ports.py                       protocol boundaries
   appservice.py                  ingestion and override orchestration
+  queries.py                     read-side models and query protocol
 new_logger/
   macos/                         macOS capture and browser metadata
   sanitization/                  URL privacy handling
 new_storage/
   sqlite.py                      SQLite storage implementation
+  sqlite_queries.py              event queries and duration aggregations
 new_classifiers/
   rules.py                       deterministic rules classifier
 new_tests/
@@ -201,7 +262,6 @@ new_tests/
 The refactored capture backend is functional, but it does not yet replace the
 whole application. The next pieces are:
 
-- a read/query layer for events and effective labels;
 - dashboard integration using that query layer and `AppService` override
   methods;
 - a non-noop publisher if the dashboard needs live updates;
@@ -216,9 +276,9 @@ can be added behind the existing `Classifier` protocol when needed.
 
 ## Tests
 
-The refactored unit tests cover application orchestration, SQLite persistence,
-rules classification, and URL sanitization. macOS capture has a separate
-integration test suite.
+The refactored unit tests cover application orchestration, SQLite persistence
+and queries, rules classification, and URL sanitization. macOS capture has a
+separate integration test suite.
 
 ```bash
 PYTHONPATH=. pytest -c new_tests/pytest.ini new_tests/unit

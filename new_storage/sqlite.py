@@ -6,7 +6,7 @@ import threading
 from pathlib import Path
 from typing import Optional
 
-from new_core.models import Classification, Event
+from new_core.models import CapturedEvent, Classification
 
 
 class SQLiteStorage:
@@ -34,7 +34,7 @@ class SQLiteStorage:
         with self._lock:
             self._conn.close()
 
-    def insert_event(self, e: Event) -> int:
+    def insert_event(self, e: CapturedEvent) -> int:
         with self._lock:
             cursor = self._conn.execute(
                 """

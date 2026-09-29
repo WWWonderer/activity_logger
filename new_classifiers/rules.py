@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from urllib.parse import urlparse
 
-from new_core.models import Classification, Event
+from new_core.models import CapturedEvent, Classification
 from new_core.ports import Classifier
 
 
@@ -33,7 +33,7 @@ class RulesClassifier(Classifier):
         self._rules = self._load_rules(self._rules_path)
         self._app_index, self._domain_index = self._build_indexes(self._rules)
 
-    def classify(self, e: Event) -> Classification:
+    def classify(self, e: CapturedEvent) -> Classification:
         """
         Classify an event and return the public classification result.
 

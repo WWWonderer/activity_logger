@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from new_classifiers.rules import RulesClassifier
-from new_core.models import Classification, Event
+from new_core.models import CapturedEvent, Classification
 
 
 @pytest.mark.unit
@@ -11,7 +11,7 @@ def test_rules_classifier_handles_idle_events() -> None:
     classifier = RulesClassifier()
 
     result = classifier.classify(
-        Event(
+        CapturedEvent(
             start_ts=1.0,
             end_ts=2.0,
             app="Idle",
@@ -34,7 +34,7 @@ def test_rules_classifier_matches_app_rules() -> None:
     classifier = RulesClassifier()
 
     result = classifier.classify(
-        Event(
+        CapturedEvent(
             start_ts=1.0,
             end_ts=2.0,
             app="Visual Studio Code",
@@ -53,7 +53,7 @@ def test_rules_classifier_matches_domain_path_rules() -> None:
     classifier = RulesClassifier()
 
     result = classifier.classify(
-        Event(
+        CapturedEvent(
             start_ts=1.0,
             end_ts=2.0,
             app="Firefox",

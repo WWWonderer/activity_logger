@@ -6,15 +6,15 @@ from dataclasses import dataclass, field
 from typing import Callable, Optional
 
 from new_core.appservice import AppService
-from new_core.models import Classification, Event
+from new_core.models import CapturedEvent, Classification
 
 
 class FakeSource:
     def __init__(self) -> None:
-        self.emit: Optional[Callable[[Event], None]] = None
+        self.emit: Optional[Callable[[CapturedEvent], None]] = None
         self.stopped = False
 
-    def start(self, emit: Callable[[Event], None]) -> None:
+    def start(self, emit: Callable[[CapturedEvent], None]) -> None:
         self.emit = emit
 
     def stop(self) -> None:
@@ -23,12 +23,12 @@ class FakeSource:
 
 @dataclass
 class FakeStorage:
-    inserted_events: list[Event] = field(default_factory=list)
+    inserted_events: list[CapturedEvent] = field(default_factory=list)
     engine_labels: list[tuple[int, str, Classification]] = field(default_factory=list)
     overrides_set: list[tuple[int, str, Optional[str]]] = field(default_factory=list)
     overrides_cleared: list[int] = field(default_factory=list)
 
-    def insert_event(self, e: Event) -> int:
+    def insert_event(self, e: CapturedEvent) -> int:
         self.inserted_events.append(e)
         return len(self.inserted_events)
 
@@ -55,7 +55,7 @@ class FakeStorage:
 class FakeClassifier:
     engine_version = "rules-v1"
 
-    def classify(self, e: Event) -> Classification:
+    def classify(self, e: CapturedEvent) -> Classification:
         return Classification(category_id="work", confidence=0.9)
 
 
@@ -90,7 +90,7 @@ def test_appservice_persists_and_classifies_finalized_events() -> None:
     app.start()
     assert source.emit is not None
 
-    event = Event(
+    event = CapturedEvent(
         start_ts=10.0,
         end_ts=12.5,
         app="Safari",
@@ -116,8 +116,8 @@ def test_appservice_ignores_open_or_invalid_events() -> None:
     app.start()
     assert source.emit is not None
 
-    source.emit(Event(start_ts=10.0, end_ts=None, app="Finder", title="", url=""))
-    source.emit(Event(start_ts=10.0, end_ts=9.0, app="Finder", title="", url=""))
+    source.emit(CapturedEvent(start_ts=10.0, end_ts=None, app="Finder", title="", url=""))
+    source.emit(CapturedEvent(start_ts=10.0, end_ts=9.0, app="Finder", title="", url=""))
 
     assert storage.inserted_events == []
     assert publisher.recorded_ids == []

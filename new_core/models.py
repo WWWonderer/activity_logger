@@ -4,7 +4,7 @@ from typing import Optional, Any
 
 
 @dataclass(frozen=True)
-class Event:
+class CapturedEvent:
     """
     A segment of time during which the frontmost context is stable.
     end_ts can be None while "open" (not yet closed).

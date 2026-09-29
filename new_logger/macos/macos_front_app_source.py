@@ -6,7 +6,7 @@ from typing import Callable, Optional, Tuple, Dict
 from urllib.parse import urlsplit
 from AppKit import NSWorkspace, NSAppleScript
 
-from new_core.models import Event
+from new_core.models import CapturedEvent
 from new_core.ports import EventSource, AppOverride
 from new_logger.macos.macos_idle import make_idle_monitor
 from new_logger.macos.app_overrides import FirefoxOverride
@@ -29,7 +29,7 @@ class MacOSFrontAppSourceAdaptive(EventSource):
         # Internal State
         self._prev_key: Optional[Tuple[str, str, str]] = None
         self._open_start_ts: Optional[float] = None
-        self.emit: Optional[Callable[[Event], None]] = None
+        self.emit: Optional[Callable[[CapturedEvent], None]] = None
 
         # AppleScript for Title and URL
         self.script_source = """
@@ -99,7 +99,7 @@ class MacOSFrontAppSourceAdaptive(EventSource):
         end_ts = time.time()
 
         # Create the domain model event
-        event = Event(
+        event = CapturedEvent(
             start_ts=self._open_start_ts, 
             end_ts=end_ts, 
             app=app, 
@@ -115,7 +115,7 @@ class MacOSFrontAppSourceAdaptive(EventSource):
         self._open_start_ts = None
         self._prev_key = None
 
-    def start(self, emit_callback: Callable[[Event], None]):
+    def start(self, emit_callback: Callable[[CapturedEvent], None]):
         """Runs the monitoring loop. Designed to be called on the Main Thread."""
         self.emit = emit_callback
         self.stop_signal.clear()

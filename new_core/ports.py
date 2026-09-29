@@ -1,13 +1,13 @@
 from __future__ import annotations
 from typing import Protocol, Callable, Optional
-from .models import Event, Classification
+from .models import CapturedEvent, Classification
 
 
 class EventSource(Protocol):
     """
     Produces finalized time segments as Events (start_ts/end_ts + metadata).
     """
-    def start(self, emit: Callable[[Event], None]) -> None: ...
+    def start(self, emit: Callable[[CapturedEvent], None]) -> None: ...
     def stop(self) -> None: ...
 
 class AppOverride(Protocol):
@@ -23,7 +23,7 @@ class Classifier(Protocol):
     """
     @property
     def engine_version(self) -> str: ...
-    def classify(self, e: Event) -> Classification: ...
+    def classify(self, e: CapturedEvent) -> Classification: ...
 
 
 class Storage(Protocol):
@@ -33,7 +33,7 @@ class Storage(Protocol):
     """
 
     # Raw events
-    def insert_event(self, e: Event) -> int:
+    def insert_event(self, e: CapturedEvent) -> int:
         """Insert one finalized raw event segment. Return event_id."""
         ...
 

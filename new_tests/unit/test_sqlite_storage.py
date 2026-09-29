@@ -5,14 +5,14 @@ import sqlite3
 
 import pytest
 
-from new_core.models import Classification, Event
+from new_core.models import CapturedEvent, Classification
 from new_storage.sqlite import SQLiteStorage
 
 
 @pytest.mark.unit
 def test_sqlite_storage_inserts_events(tmp_path) -> None:
     storage = SQLiteStorage(tmp_path / "activity.sqlite3")
-    event = Event(
+    event = CapturedEvent(
         start_ts=10.0,
         end_ts=12.5,
         app="Safari",
@@ -51,7 +51,7 @@ def test_sqlite_storage_inserts_events(tmp_path) -> None:
 def test_sqlite_storage_upserts_engine_classifications(tmp_path) -> None:
     storage = SQLiteStorage(tmp_path / "activity.sqlite3")
     event_id = storage.insert_event(
-        Event(start_ts=1.0, end_ts=2.0, app="Code", title="Editor", url="")
+        CapturedEvent(start_ts=1.0, end_ts=2.0, app="Code", title="Editor", url="")
     )
 
     storage.upsert_engine_classification(
@@ -96,7 +96,7 @@ def test_sqlite_storage_upserts_engine_classifications(tmp_path) -> None:
 def test_sqlite_storage_sets_and_clears_user_overrides(tmp_path) -> None:
     storage = SQLiteStorage(tmp_path / "activity.sqlite3")
     event_id = storage.insert_event(
-        Event(start_ts=1.0, end_ts=2.0, app="Code", title="Editor", url="")
+        CapturedEvent(start_ts=1.0, end_ts=2.0, app="Code", title="Editor", url="")
     )
 
     storage.set_user_override(event_id, "focus", note="manual")
